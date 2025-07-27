@@ -5,7 +5,7 @@ class FuelController extends BaseController {
     
     public function index() {
         $this->requireLogin();
-        $this->requireRole(['super_admin', 'admin', 'data_entry_officer']);
+        $this->requireAnyRole(['super_admin', 'admin', 'data_entry_officer']);
         
         try {
             require_once __DIR__ . '/../models/FuelRecord.php';
@@ -31,7 +31,7 @@ class FuelController extends BaseController {
     
     public function record() {
         $this->requireLogin();
-        $this->requireRole(['super_admin', 'admin', 'data_entry_officer']);
+        $this->requireAnyRole(['super_admin', 'admin', 'data_entry_officer']);
         
         $data = [
             'pageTitle' => 'Record Fuel - State Fleet Management System'

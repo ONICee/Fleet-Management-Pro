@@ -463,15 +463,15 @@ if (!function_exists('url')) {
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-6">
-                    <p class="mb-0 text-muted">
-                        <i class="fas fa-copyright me-1"></i>
+                    <p class="mb-0 text-light">
+                        <i class="fas fa-copyright me-1 text-warning"></i>
                         <?= date('Y') ?> State Fleet Management System. All rights reserved.
                     </p>
                 </div>
                 <div class="col-md-6 text-end">
-                    <p class="mb-0 text-muted">
-                        Version <?= APP_VERSION ?> | 
-                        <span class="text-gold">Enterprise Grade</span>
+                    <p class="mb-0 text-light">
+                        Version 1.0.0 | 
+                        <span class="text-warning fw-bold">Enterprise Grade</span>
                     </p>
                 </div>
             </div>

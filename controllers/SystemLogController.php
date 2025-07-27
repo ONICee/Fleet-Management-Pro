@@ -6,7 +6,7 @@ class SystemLogController extends BaseController {
     
     public function index() {
         $this->requireLogin();
-        $this->requireRole(['super_admin']);
+        $this->requireRole('super_admin');
         
         try {
             $systemLogModel = new SystemLog($this->db);

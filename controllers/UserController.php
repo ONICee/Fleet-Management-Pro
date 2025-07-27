@@ -6,7 +6,7 @@ class UserController extends BaseController {
     
     public function index() {
         $this->requireLogin();
-        $this->requireRole(['super_admin']);
+        $this->requireRole('super_admin');
         
         try {
             $userModel = new User($this->db);
@@ -43,7 +43,7 @@ class UserController extends BaseController {
     
     public function create() {
         $this->requireLogin();
-        $this->requireRole(['super_admin']);
+        $this->requireRole('super_admin');
         
         if ($this->isPost()) {
             $this->validateCSRF();

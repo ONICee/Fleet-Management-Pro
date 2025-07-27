@@ -46,6 +46,10 @@ class BaseController {
         $this->session->requireAnyRole($roles);
     }
     
+    protected function requireAnyRole($roles) {
+        $this->session->requireAnyRole($roles);
+    }
+    
     protected function requirePermission($resource) {
         $this->session->requirePermission($resource);
     }

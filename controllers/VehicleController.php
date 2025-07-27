@@ -38,7 +38,7 @@ class VehicleController extends BaseController {
     
     public function create() {
         $this->requireLogin();
-        $this->requireRole(['super_admin', 'admin', 'data_entry_officer']);
+        $this->requireAnyRole(['super_admin', 'admin', 'data_entry_officer']);
         
         if ($this->isPost()) {
             $this->validateCSRF();
@@ -79,7 +79,7 @@ class VehicleController extends BaseController {
     
     public function edit() {
         $this->requireLogin();
-        $this->requireRole(['super_admin', 'admin', 'data_entry_officer']);
+        $this->requireAnyRole(['super_admin', 'admin', 'data_entry_officer']);
         
         $id = $this->params['id'] ?? null;
         
@@ -162,7 +162,7 @@ class VehicleController extends BaseController {
     
     public function delete() {
         $this->requireLogin();
-        $this->requireRole(['super_admin', 'admin']);
+        $this->requireAnyRole(['super_admin', 'admin']);
         
         if (!$this->isPost()) {
             $this->session->setFlashMessage('error', 'Invalid request method');

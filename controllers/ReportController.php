@@ -5,7 +5,7 @@ class ReportController extends BaseController {
     
     public function index() {
         $this->requireLogin();
-        $this->requireRole(['super_admin', 'admin']);
+        $this->requireAnyRole(['super_admin', 'admin']);
         
         try {
             require_once __DIR__ . '/../models/Vehicle.php';
