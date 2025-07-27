@@ -1,8 +1,3 @@
-<?php
-$pageTitle = 'Dashboard - State Fleet Management System';
-require_once __DIR__ . '/../layouts/app.php';
-?>
-
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">

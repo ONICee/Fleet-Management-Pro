@@ -168,8 +168,10 @@ class BaseController {
         $userRole = $this->getUserRole();
         $flashMessages = $this->session->getFlashMessages();
         $csrfToken = $this->session->generateCSRFToken();
+        $pageTitle = $data['pageTitle'] ?? 'State Fleet Management System';
         
-        // Include the view file
+        // Capture the view content
+        ob_start();
         $viewFile = __DIR__ . '/../views/' . $view . '.php';
         
         if (file_exists($viewFile)) {
@@ -177,6 +179,12 @@ class BaseController {
         } else {
             throw new Exception("View file not found: $view");
         }
+        
+        $content = ob_get_contents();
+        ob_end_clean();
+        
+        // Include the layout with content
+        include __DIR__ . '/../views/layouts/app.php';
     }
     
     protected function renderAPI($data, $statusCode = 200) {

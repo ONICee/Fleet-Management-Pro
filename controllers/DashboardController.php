@@ -52,6 +52,7 @@ class DashboardController extends BaseController {
             // Log dashboard access
             $this->logActivity('view_dashboard', 'dashboard');
             
+            $dashboardData['pageTitle'] = 'Dashboard - State Fleet Management System';
             $this->renderView('dashboard/index', $dashboardData);
             
         } catch (Exception $e) {
