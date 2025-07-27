@@ -14,6 +14,64 @@
         </div>
     </div>
 
+    <!-- Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-dark border-secondary">
+                <div class="card-body">
+                    <form method="GET" class="row g-3" id="filterForm">
+                        <div class="col-md-3">
+                            <label for="search" class="form-label text-light">Search</label>
+                            <input type="text" class="form-control bg-dark text-light border-secondary" 
+                                   id="search" name="search" placeholder="Brand, model, serial..." 
+                                   value="<?= htmlspecialchars($_GET['search'] ?? '') ?>">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="agency" class="form-label text-light">Agency</label>
+                            <select class="form-control bg-dark text-light border-secondary" id="agency" name="agency">
+                                <option value="">All Agencies</option>
+                                <?php foreach ($agencies as $agency): ?>
+                                    <option value="<?= $agency['id'] ?>" <?= ($_GET['agency'] ?? '') == $agency['id'] ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($agency['agency_code']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="serviceability" class="form-label text-light">Status</label>
+                            <select class="form-control bg-dark text-light border-secondary" id="serviceability" name="filter">
+                                <option value="">All Vehicles</option>
+                                <option value="serviceable" <?= ($_GET['filter'] ?? '') === 'serviceable' ? 'selected' : '' ?>>Serviceable</option>
+                                <option value="unserviceable" <?= ($_GET['filter'] ?? '') === 'unserviceable' ? 'selected' : '' ?>>Unserviceable</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="vehicle_type" class="form-label text-light">Type</label>
+                            <select class="form-control bg-dark text-light border-secondary" id="vehicle_type" name="vehicle_type">
+                                <option value="">All Types</option>
+                                <option value="car" <?= ($_GET['vehicle_type'] ?? '') === 'car' ? 'selected' : '' ?>>Car</option>
+                                <option value="truck" <?= ($_GET['vehicle_type'] ?? '') === 'truck' ? 'selected' : '' ?>>Truck/SUV</option>
+                                <option value="van" <?= ($_GET['vehicle_type'] ?? '') === 'van' ? 'selected' : '' ?>>Van</option>
+                                <option value="bus" <?= ($_GET['vehicle_type'] ?? '') === 'bus' ? 'selected' : '' ?>>Bus</option>
+                                <option value="motorcycle" <?= ($_GET['vehicle_type'] ?? '') === 'motorcycle' ? 'selected' : '' ?>>Motorcycle</option>
+                                <option value="boat" <?= ($_GET['vehicle_type'] ?? '') === 'boat' ? 'selected' : '' ?>>Boat</option>
+                                <option value="drone" <?= ($_GET['vehicle_type'] ?? '') === 'drone' ? 'selected' : '' ?>>Drone</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-warning me-2">
+                                <i class="fas fa-search me-1"></i> Filter
+                            </button>
+                            <a href="<?= url('/vehicles') ?>" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i> Clear
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Statistics Cards -->
     <div class="row mb-4">
         <div class="col-md-3 mb-3">

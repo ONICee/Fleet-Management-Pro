@@ -111,7 +111,7 @@ class Vehicle extends BaseModel {
         return ['success' => false, 'errors' => ['general' => 'Failed to update vehicle']];
     }
     
-    public function getVehiclesWithDetails($conditions = [], $orderBy = 'created_at DESC') {
+    public function getVehiclesWithDetails($conditions = [], $orderBy = 'v.created_at DESC') {
         $sql = "SELECT v.*, a.agency_name, a.agency_code, a.agency_type,
                        dl.location_name, dl.local_government, dl.senatorial_zone
                 FROM vehicles v
@@ -119,13 +119,26 @@ class Vehicle extends BaseModel {
                 LEFT JOIN deployment_locations dl ON v.deployment_location_id = dl.id";
         
         $params = [];
+        $whereClause = [];
         
         if (!empty($conditions)) {
-            $whereClause = [];
             foreach ($conditions as $column => $value) {
-                $whereClause[] = "v.{$column} = ?";
-                $params[] = $value;
+                if ($column === 'search') {
+                    // Search across multiple fields
+                    $whereClause[] = "(v.vehicle_brand LIKE ? OR v.vehicle_model LIKE ? OR v.serial_number LIKE ? OR v.license_plate LIKE ?)";
+                    $searchValue = '%' . $value . '%';
+                    $params[] = $searchValue;
+                    $params[] = $searchValue;
+                    $params[] = $searchValue;
+                    $params[] = $searchValue;
+                } else {
+                    $whereClause[] = "v.{$column} = ?";
+                    $params[] = $value;
+                }
             }
+        }
+        
+        if (!empty($whereClause)) {
             $sql .= " WHERE " . implode(' AND ', $whereClause);
         }
         

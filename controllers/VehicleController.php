@@ -12,8 +12,23 @@ class VehicleController extends BaseController {
         $agencyModel = new Agency($this->db);
         
         try {
-            // Get all vehicles with agency and location details
-            $vehicles = $vehicleModel->getVehiclesWithDetails();
+            // Handle filters
+            $filters = [];
+            if (!empty($_GET['search'])) {
+                $filters['search'] = $_GET['search'];
+            }
+            if (!empty($_GET['agency'])) {
+                $filters['agency_id'] = $_GET['agency'];
+            }
+            if (!empty($_GET['filter'])) {
+                $filters['serviceability'] = $_GET['filter'];
+            }
+            if (!empty($_GET['vehicle_type'])) {
+                $filters['vehicle_type'] = $_GET['vehicle_type'];
+            }
+            
+            // Get vehicles with filters
+            $vehicles = $vehicleModel->getVehiclesWithDetails($filters);
             
             // Get agencies for filters
             $agencies = $agencyModel->findAll();
