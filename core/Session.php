@@ -180,5 +180,41 @@ class Session {
     public function validateCSRFToken($token) {
         return hash_equals($this->get('csrf_token', ''), $token);
     }
+    
+    public function createSessionRecord($db, $userId) {
+        try {
+            $sessionId = session_id();
+            $expiresAt = date('Y-m-d H:i:s', time() + (24 * 60 * 60)); // 24 hours from now
+            
+            $sql = "INSERT INTO user_sessions (id, user_id, ip_address, user_agent, expires_at) 
+                    VALUES (?, ?, ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE 
+                    last_activity = CURRENT_TIMESTAMP, 
+                    expires_at = ?";
+            
+            $stmt = $db->prepare($sql);
+            $stmt->execute([
+                $sessionId,
+                $userId,
+                $_SERVER['REMOTE_ADDR'] ?? null,
+                $_SERVER['HTTP_USER_AGENT'] ?? null,
+                $expiresAt,
+                $expiresAt
+            ]);
+            
+        } catch (Exception $e) {
+            error_log("Failed to create session record: " . $e->getMessage());
+        }
+    }
+    
+    public function cleanupExpiredSessions($db) {
+        try {
+            $sql = "DELETE FROM user_sessions WHERE expires_at < NOW()";
+            $stmt = $db->prepare($sql);
+            $stmt->execute();
+        } catch (Exception $e) {
+            error_log("Failed to cleanup expired sessions: " . $e->getMessage());
+        }
+    }
 }
 ?>

@@ -66,6 +66,11 @@ The State Fleet Management System is an enterprise-grade application designed to
    mysql -u fleet_user -p fleet_management < database/schema.sql
    ```
 
+   **Note**: If you encounter MySQL error #1067 with the user_sessions table, run the fix:
+   ```bash
+   mysql -u fleet_user -p fleet_management < database/fix_user_sessions.sql
+   ```
+
 #### Option B: Using Database Administration Tool
 
 1. Open phpMyAdmin or your preferred database tool
@@ -234,17 +239,23 @@ The system comes with pre-configured user accounts for different roles:
 - Ensure MySQL/MariaDB service is running
 - Check database user permissions
 
-#### 2. 404 Errors for All Pages
+#### 2. MySQL Error #1067 (Invalid default value for 'expires_at')
+This occurs on some MySQL/MariaDB versions with timestamp handling:
+- Run the fix script: `mysql -u fleet_user -p fleet_management < database/fix_user_sessions.sql`
+- Or manually execute the commands in `database/fix_user_sessions.sql`
+- This recreates the user_sessions table with proper column definitions
+
+#### 3. 404 Errors for All Pages
 - Verify mod_rewrite is enabled (Apache)
 - Check .htaccess file exists and is readable
 - For Nginx, verify rewrite rules are configured
 
-#### 3. Permission Denied Errors
+#### 4. Permission Denied Errors
 - Check file permissions (755 for directories, 644 for files)
 - Ensure web server has read access to all files
 - Verify database connection permissions
 
-#### 4. Session Issues
+#### 5. Session Issues
 - Check PHP session configuration
 - Verify session directory permissions
 - Clear browser cookies and cache

@@ -28,6 +28,12 @@ class AuthController extends BaseController {
                 if ($user) {
                     $this->session->setUser($user);
                     
+                    // Create session record for tracking
+                    $this->session->createSessionRecord($this->db, $user['id']);
+                    
+                    // Clean up expired sessions
+                    $this->session->cleanupExpiredSessions($this->db);
+                    
                     // Log successful login
                     $this->logActivity('login', 'user', $user['id']);
                     
