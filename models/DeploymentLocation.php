@@ -7,7 +7,11 @@ class DeploymentLocation extends BaseModel {
         parent::__construct($db, 'deployment_locations');
     }
     
-    public function findAll() {
+    public function findAll($conditions = [], $orderBy = 'location_name', $limit = null) {
+        return parent::findAll($conditions, $orderBy, $limit);
+    }
+    
+    public function getAllLocations() {
         $sql = "SELECT * FROM deployment_locations ORDER BY location_name";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();

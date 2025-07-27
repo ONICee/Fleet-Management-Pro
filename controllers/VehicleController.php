@@ -66,7 +66,7 @@ class VehicleController extends BaseController {
         // Also get deployment locations
         require_once __DIR__ . '/../models/DeploymentLocation.php';
         $locationModel = new DeploymentLocation($this->db);
-        $locations = $locationModel->findAll();
+        $locations = $locationModel->getAllLocations();
         
         $data = [
             'pageTitle' => 'Add New Vehicle - State Fleet Management System',

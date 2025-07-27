@@ -90,6 +90,7 @@ class Application {
         $this->router->add('/users', 'UserController@index');
         $this->router->add('/users/create', 'UserController@create');
         $this->router->add('/users/edit/{id}', 'UserController@edit');
+        $this->router->add('/users/delete/{id}', 'UserController@delete');
         $this->router->add('/users/profile', 'UserController@profile');
         
         // Notification routes

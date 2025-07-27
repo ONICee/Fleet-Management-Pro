@@ -131,9 +131,10 @@
                                             </td>
                                             <td>
                                                 <?php if ($user['last_login']): ?>
-                                                    <small class="text-muted"><?= date('M j, Y g:i A', strtotime($user['last_login'])) ?></small>
+                                                    <span class="text-light"><?= date('M j, Y', strtotime($user['last_login'])) ?></span><br>
+                                                    <small class="text-success"><?= date('g:i A', strtotime($user['last_login'])) ?></small>
                                                 <?php else: ?>
-                                                    <small class="text-muted">Never</small>
+                                                    <span class="text-warning">Never</span>
                                                 <?php endif; ?>
                                             </td>
                                             <td>
@@ -145,7 +146,8 @@
                                                        class="btn btn-outline-warning" title="Edit">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
-                                                    <?php if ($user['id'] !== $this->getUser()['id']): ?>
+                                                    <?php if ($user['id'] !== $this->getUser()['id'] && 
+                                                              !($userRole === 'admin' && $user['role'] === 'super_admin')): ?>
                                                         <button type="button" 
                                                                 class="btn btn-outline-danger" 
                                                                 title="Delete"
