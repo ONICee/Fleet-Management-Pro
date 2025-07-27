@@ -1,3 +1,9 @@
+<?php
+// Ensure helpers are available
+if (!function_exists('url')) {
+    require_once __DIR__ . '/../../core/helpers.php';
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -290,7 +296,7 @@
     <?php if (isset($user) && $user): ?>
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/dashboard">
+                            <a class="navbar-brand" href="<?= url('/dashboard') ?>">
                 <i class="fas fa-truck me-2"></i>
                 <?= APP_NAME ?>
             </a>
@@ -302,25 +308,25 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/dashboard">
+                        <a class="nav-link" href="<?= url('/dashboard') ?>">
                             <i class="fas fa-tachometer-alt me-1"></i> Dashboard
                         </a>
                     </li>
                     <?php if ($userRole !== 'guest'): ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="/vehicles">
+                        <a class="nav-link" href="<?= url('/vehicles') ?>">
                             <i class="fas fa-car me-1"></i> Vehicles
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/maintenance">
+                        <a class="nav-link" href="<?= url('/maintenance') ?>">
                             <i class="fas fa-wrench me-1"></i> Maintenance
                         </a>
                     </li>
                     <?php endif; ?>
                     <?php if (in_array($userRole, ['super_admin', 'admin'])): ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="/reports">
+                        <a class="nav-link" href="<?= url('/reports') ?>">
                             <i class="fas fa-chart-bar me-1"></i> Reports
                         </a>
                     </li>
@@ -340,7 +346,7 @@
                                 <li><span class="dropdown-item-text text-muted">No new notifications</span></li>
                             </div>
                             <li><hr class="dropdown-divider" style="border-color: var(--light-black);"></li>
-                            <li><a class="dropdown-item text-light" href="/notifications">View All</a></li>
+                            <li><a class="dropdown-item text-light" href="<?= url('/notifications') ?>">View All</a></li>
                         </ul>
                     </li>
                     
@@ -352,12 +358,12 @@
                         <ul class="dropdown-menu dropdown-menu-end" style="background: var(--secondary-black); border: 1px solid var(--primary-gold);">
                             <li><span class="dropdown-header text-gold"><?= htmlspecialchars(ucfirst(str_replace('_', ' ', $userRole))) ?></span></li>
                             <li><hr class="dropdown-divider" style="border-color: var(--light-black);"></li>
-                            <li><a class="dropdown-item text-light" href="/users/profile"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item text-light" href="<?= url('/users/profile') ?>"><i class="fas fa-user me-2"></i>Profile</a></li>
                             <?php if ($userRole === 'super_admin'): ?>
-                            <li><a class="dropdown-item text-light" href="/users"><i class="fas fa-users me-2"></i>Manage Users</a></li>
+                            <li><a class="dropdown-item text-light" href="<?= url('/users') ?>"><i class="fas fa-users me-2"></i>Manage Users</a></li>
                             <?php endif; ?>
                             <li><hr class="dropdown-divider" style="border-color: var(--light-black);"></li>
-                            <li><a class="dropdown-item text-light" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                            <li><a class="dropdown-item text-light" href="<?= url('/logout') ?>"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -395,41 +401,41 @@
             <div class="col-md-3 col-lg-2 px-0">
                 <div class="sidebar">
                     <nav class="nav flex-column py-3">
-                        <a class="nav-link" href="/dashboard">
+                        <a class="nav-link" href="<?= url('/dashboard') ?>">
                             <i class="fas fa-tachometer-alt me-2"></i> Dashboard
                         </a>
                         
                         <?php if ($userRole !== 'guest'): ?>
-                        <a class="nav-link" href="/vehicles">
+                        <a class="nav-link" href="<?= url('/vehicles') ?>">
                             <i class="fas fa-car me-2"></i> Vehicles
                         </a>
-                        <a class="nav-link" href="/agencies">
+                        <a class="nav-link" href="<?= url('/agencies') ?>">
                             <i class="fas fa-building me-2"></i> Agencies
                         </a>
-                        <a class="nav-link" href="/maintenance">
+                        <a class="nav-link" href="<?= url('/maintenance') ?>">
                             <i class="fas fa-wrench me-2"></i> Maintenance
                         </a>
-                        <a class="nav-link" href="/fuel">
+                        <a class="nav-link" href="<?= url('/fuel') ?>">
                             <i class="fas fa-gas-pump me-2"></i> Fuel Records
                         </a>
                         <?php endif; ?>
                         
                         <?php if (in_array($userRole, ['super_admin', 'admin'])): ?>
-                        <a class="nav-link" href="/reports">
+                        <a class="nav-link" href="<?= url('/reports') ?>">
                             <i class="fas fa-chart-bar me-2"></i> Reports
                         </a>
                         <?php endif; ?>
                         
                         <?php if ($userRole === 'super_admin'): ?>
-                        <a class="nav-link" href="/users">
+                        <a class="nav-link" href="<?= url('/users') ?>">
                             <i class="fas fa-users me-2"></i> Users
                         </a>
-                        <a class="nav-link" href="/system-logs">
+                        <a class="nav-link" href="<?= url('/system-logs') ?>">
                             <i class="fas fa-history me-2"></i> System Logs
                         </a>
                         <?php endif; ?>
                         
-                        <a class="nav-link" href="/notifications">
+                        <a class="nav-link" href="<?= url('/notifications') ?>">
                             <i class="fas fa-bell me-2"></i> Notifications
                         </a>
                     </nav>

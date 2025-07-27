@@ -38,7 +38,7 @@ ob_start();
                     
                     <div class="card-body p-4">
                         <!-- Login Form -->
-                        <form method="POST" action="/login" id="loginForm">
+                        <form method="POST" action="<?= url('/login') ?>" id="loginForm">
                             <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
                             
                             <div class="mb-4">

@@ -127,7 +127,7 @@
         </p>
         
         <div class="d-flex gap-3 justify-content-center flex-wrap">
-            <a href="/" class="btn btn-home">
+                                <a href="<?= url('/') ?>" class="btn btn-home">
                 <i class="fas fa-home me-2"></i>
                 Return to Dashboard
             </a>
