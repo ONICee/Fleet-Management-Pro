@@ -63,9 +63,15 @@ class VehicleController extends BaseController {
         $agencyModel = new Agency($this->db);
         $agencies = $agencyModel->findAll();
         
+        // Also get deployment locations
+        require_once __DIR__ . '/../models/DeploymentLocation.php';
+        $locationModel = new DeploymentLocation($this->db);
+        $locations = $locationModel->findAll();
+        
         $data = [
             'pageTitle' => 'Add New Vehicle - State Fleet Management System',
-            'agencies' => $agencies
+            'agencies' => $agencies,
+            'locations' => $locations
         ];
         
         $this->renderView('vehicles/create', $data);
