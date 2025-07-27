@@ -1,322 +1,633 @@
--- Fleet Management System Database Schema
--- Enterprise Grade Fleet Management
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: Jul 27, 2025 at 03:53 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
-CREATE DATABASE IF NOT EXISTS fleet_management CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE fleet_management;
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
 
--- Users table for authentication and authorization
-CREATE TABLE users (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    first_name VARCHAR(50) NOT NULL,
-    last_name VARCHAR(50) NOT NULL,
-    role ENUM('super_admin', 'admin', 'data_entry_officer', 'guest') DEFAULT 'guest',
-    phone VARCHAR(20),
-    status ENUM('active', 'inactive', 'suspended') DEFAULT 'active',
-    last_login TIMESTAMP NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
 
--- Agencies table for state security and related agencies
-CREATE TABLE agencies (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    agency_name VARCHAR(100) NOT NULL,
-    agency_code VARCHAR(20) UNIQUE NOT NULL,
-    agency_type ENUM('federal', 'state', 'local') NOT NULL,
-    contact_person VARCHAR(100),
-    contact_phone VARCHAR(20),
-    contact_email VARCHAR(100),
-    headquarters_address TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+--
+-- Database: `fleet_mgt`
+--
 
--- Locations/Deployment areas within the state
-CREATE TABLE deployment_locations (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    location_name VARCHAR(100) NOT NULL,
-    local_government VARCHAR(50),
-    senatorial_zone ENUM('north', 'central', 'south'),
-    state_zone VARCHAR(50),
-    address TEXT,
-    coordinates VARCHAR(50),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+CREATE DATABASE IF NOT EXISTS fleet_mgt CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE fleet_mgt;
 
--- Vehicles table (Enhanced for state specifications)
-CREATE TABLE vehicles (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    vehicle_brand VARCHAR(50) NOT NULL,
-    vehicle_model VARCHAR(50) NOT NULL,
-    serial_number VARCHAR(30) UNIQUE NOT NULL, -- State-allotted serial number
-    year_allotted YEAR NOT NULL,
-    year_manufactured YEAR,
-    vehicle_type ENUM('land', 'air', 'sea', 'drone', 'motorcycle', 'truck', 'van', 'car', 'bus', 'boat', 'helicopter', 'other') NOT NULL,
-    fuel_type ENUM('gasoline', 'diesel', 'electric', 'hybrid', 'jet_fuel', 'battery', 'other') NOT NULL,
-    
-    -- Vehicle identification details
-    engine_number VARCHAR(50),
-    chassis_number VARCHAR(50),
-    license_plate VARCHAR(15),
-    vin VARCHAR(17),
-    
-    -- Tracker information
-    tracker_number VARCHAR(50),
-    tracker_imei VARCHAR(20),
-    tracker_status ENUM('active', 'inactive', 'not_installed') DEFAULT 'not_installed',
-    
-    -- Assignment details
-    agency_id INT NOT NULL,
-    deployment_location_id INT NOT NULL,
-    
-    -- Serviceability status
-    serviceability ENUM('serviceable', 'unserviceable') DEFAULT 'serviceable',
-    current_condition TEXT,
-    current_mileage INT DEFAULT 0,
-    
-    -- Purchase/Acquisition details
-    purchase_date DATE,
-    purchase_price DECIMAL(12,2),
-    supplier VARCHAR(100),
-    
-    -- Maintenance tracking
-    last_overhaul DATE NULL,
-    next_overhaul DATE NULL,
-    last_scheduled_maintenance DATE NULL,
-    next_scheduled_maintenance DATE NULL,
-    
-    -- Insurance and registration
-    insurance_policy VARCHAR(50),
-    insurance_expiry DATE,
-    registration_expiry DATE,
-    
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
-    FOREIGN KEY (agency_id) REFERENCES agencies(id),
-    FOREIGN KEY (deployment_location_id) REFERENCES deployment_locations(id)
-);
+-- --------------------------------------------------------
 
--- Drivers table
-CREATE TABLE drivers (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
-    license_number VARCHAR(30) UNIQUE NOT NULL,
-    license_class VARCHAR(10) NOT NULL,
-    license_expiry DATE NOT NULL,
-    hire_date DATE NOT NULL,
-    emergency_contact_name VARCHAR(100),
-    emergency_contact_phone VARCHAR(20),
-    address TEXT,
-    city VARCHAR(50),
-    state VARCHAR(50),
-    zip_code VARCHAR(10),
-    status ENUM('active', 'inactive', 'suspended', 'on_leave') DEFAULT 'active',
-    rating DECIMAL(3,2) DEFAULT 5.00,
-    total_trips INT DEFAULT 0,
-    total_distance DECIMAL(10,2) DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+--
+-- Table structure for table `agencies`
+--
 
--- Vehicle assignments
-CREATE TABLE vehicle_assignments (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    vehicle_id INT NOT NULL,
-    driver_id INT NOT NULL,
-    assigned_date DATE NOT NULL,
-    unassigned_date DATE NULL,
-    status ENUM('active', 'completed') DEFAULT 'active',
-    notes TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE,
-    FOREIGN KEY (driver_id) REFERENCES drivers(id) ON DELETE CASCADE
-);
+CREATE TABLE `agencies` (
+  `id` int(11) NOT NULL,
+  `agency_name` varchar(100) NOT NULL,
+  `agency_code` varchar(20) NOT NULL,
+  `agency_type` enum('federal','state','local') NOT NULL,
+  `contact_person` varchar(100) DEFAULT NULL,
+  `contact_phone` varchar(20) DEFAULT NULL,
+  `contact_email` varchar(100) DEFAULT NULL,
+  `headquarters_address` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Trips table
-CREATE TABLE trips (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    trip_number VARCHAR(20) UNIQUE NOT NULL,
-    vehicle_id INT NOT NULL,
-    driver_id INT NOT NULL,
-    route_name VARCHAR(100),
-    start_location VARCHAR(200) NOT NULL,
-    end_location VARCHAR(200) NOT NULL,
-    planned_departure DATETIME NOT NULL,
-    planned_arrival DATETIME NOT NULL,
-    actual_departure DATETIME NULL,
-    actual_arrival DATETIME NULL,
-    start_mileage INT,
-    end_mileage INT,
-    distance_planned DECIMAL(8,2),
-    distance_actual DECIMAL(8,2),
-    fuel_consumed DECIMAL(8,2),
-    status ENUM('planned', 'in_progress', 'completed', 'cancelled', 'delayed') DEFAULT 'planned',
-    priority ENUM('low', 'normal', 'high', 'urgent') DEFAULT 'normal',
-    cargo_description TEXT,
-    cargo_weight DECIMAL(8,2),
-    special_instructions TEXT,
-    created_by INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (vehicle_id) REFERENCES vehicles(id),
-    FOREIGN KEY (driver_id) REFERENCES drivers(id),
-    FOREIGN KEY (created_by) REFERENCES users(id)
-);
+--
+-- Dumping data for table `agencies`
+--
 
--- Maintenance schedules and records (Enhanced for state specifications)
-CREATE TABLE maintenance_schedules (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    vehicle_id INT NOT NULL,
-    maintenance_category ENUM('scheduled', 'unscheduled', 'overhaul') NOT NULL,
-    maintenance_type VARCHAR(100) NOT NULL,
-    description TEXT NOT NULL,
-    scheduled_date DATE NOT NULL,
-    mileage_due INT,
-    status ENUM('scheduled', 'in_progress', 'completed', 'overdue', 'cancelled') DEFAULT 'scheduled',
-    priority ENUM('low', 'normal', 'high', 'critical') DEFAULT 'normal',
-    estimated_cost DECIMAL(10,2),
-    actual_cost DECIMAL(10,2),
-    service_provider VARCHAR(100),
-    work_order_number VARCHAR(50),
-    parts_replaced TEXT,
-    labor_hours DECIMAL(5,2),
-    notes TEXT,
-    completed_date DATE NULL,
-    next_service_date DATE NULL,
-    authorized_by INT,
-    performed_by VARCHAR(100),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE,
-    FOREIGN KEY (authorized_by) REFERENCES users(id)
-);
+INSERT INTO `agencies` (`id`, `agency_name`, `agency_code`, `agency_type`, `contact_person`, `contact_phone`, `contact_email`, `headquarters_address`, `created_at`, `updated_at`) VALUES
+(1, 'State Police Command', 'SPC', 'state', 'Commissioner of Police', '+234-xxx-xxx-xxxx', NULL, 'State Police Headquarters', '2025-07-27 13:51:29', '2025-07-27 13:51:29'),
+(2, 'Federal Road Safety Corps', 'FRSC', 'federal', 'Sector Commander', '+234-xxx-xxx-xxxx', NULL, 'FRSC State Command', '2025-07-27 13:51:29', '2025-07-27 13:51:29'),
+(3, 'Nigeria Security and Civil Defence Corps', 'NSCDC', 'federal', 'State Commandant', '+234-xxx-xxx-xxxx', NULL, 'NSCDC State Command', '2025-07-27 13:51:29', '2025-07-27 13:51:29'),
+(4, 'State Traffic Management Agency', 'STMA', 'state', 'General Manager', '+234-xxx-xxx-xxxx', NULL, 'STMA Headquarters', '2025-07-27 13:51:29', '2025-07-27 13:51:29'),
+(5, 'Nigeria Customs Service', 'NCS', 'federal', 'Area Controller', '+234-xxx-xxx-xxxx', NULL, 'Customs Area Command', '2025-07-27 13:51:29', '2025-07-27 13:51:29'),
+(6, 'Nigeria Immigration Service', 'NIS', 'federal', 'State Controller', '+234-xxx-xxx-xxxx', NULL, 'Immigration State Command', '2025-07-27 13:51:29', '2025-07-27 13:51:29'),
+(7, 'Department of State Services', 'DSS', 'federal', 'State Director', '+234-xxx-xxx-xxxx', NULL, 'DSS State Office', '2025-07-27 13:51:29', '2025-07-27 13:51:29'),
+(8, 'Nigeria Police Force Mobile Unit', 'MOPOL', 'federal', 'Unit Commander', '+234-xxx-xxx-xxxx', NULL, 'Mobile Police Base', '2025-07-27 13:51:29', '2025-07-27 13:51:29');
 
--- Vehicle maintenance history for detailed tracking
-CREATE TABLE maintenance_history (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    vehicle_id INT NOT NULL,
-    maintenance_schedule_id INT,
-    maintenance_date DATE NOT NULL,
-    maintenance_category ENUM('scheduled', 'unscheduled', 'overhaul') NOT NULL,
-    work_performed TEXT NOT NULL,
-    parts_used TEXT,
-    cost DECIMAL(10,2),
-    mileage_at_service INT,
-    service_provider VARCHAR(100),
-    technician_name VARCHAR(100),
-    before_condition TEXT,
-    after_condition TEXT,
-    warranty_period INT, -- in months
-    created_by INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE,
-    FOREIGN KEY (maintenance_schedule_id) REFERENCES maintenance_schedules(id),
-    FOREIGN KEY (created_by) REFERENCES users(id)
-);
+-- --------------------------------------------------------
 
--- Fuel records
-CREATE TABLE fuel_records (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    vehicle_id INT NOT NULL,
-    driver_id INT NOT NULL,
-    fuel_station VARCHAR(100),
-    fuel_type ENUM('gasoline', 'diesel', 'electric') NOT NULL,
-    quantity DECIMAL(8,2) NOT NULL,
-    price_per_unit DECIMAL(6,3) NOT NULL,
-    total_cost DECIMAL(10,2) NOT NULL,
-    mileage_at_fillup INT NOT NULL,
-    receipt_number VARCHAR(50),
-    fuel_date DATE NOT NULL,
-    location VARCHAR(200),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (vehicle_id) REFERENCES vehicles(id),
-    FOREIGN KEY (driver_id) REFERENCES drivers(id)
-);
+--
+-- Table structure for table `deployment_locations`
+--
 
--- Notifications system
-CREATE TABLE notifications (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
-    type ENUM('maintenance_due', 'trip_delay', 'vehicle_issue', 'document_expiry', 'fuel_alert', 'system') NOT NULL,
-    title VARCHAR(200) NOT NULL,
-    message TEXT NOT NULL,
-    priority ENUM('low', 'normal', 'high', 'urgent') DEFAULT 'normal',
-    is_read BOOLEAN DEFAULT FALSE,
-    action_required BOOLEAN DEFAULT FALSE,
-    related_id INT NULL, -- Can reference trips, vehicles, maintenance, etc.
-    related_type VARCHAR(50) NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    read_at TIMESTAMP NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+CREATE TABLE `deployment_locations` (
+  `id` int(11) NOT NULL,
+  `location_name` varchar(100) NOT NULL,
+  `local_government` varchar(50) DEFAULT NULL,
+  `senatorial_zone` enum('north','central','south') DEFAULT NULL,
+  `state_zone` varchar(50) DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `coordinates` varchar(50) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- System logs for audit trail
-CREATE TABLE system_logs (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NULL,
-    action VARCHAR(100) NOT NULL,
-    entity_type VARCHAR(50) NOT NULL,
-    entity_id INT NULL,
-    old_values JSON NULL,
-    new_values JSON NULL,
-    ip_address VARCHAR(45),
-    user_agent TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
-);
+--
+-- Dumping data for table `deployment_locations`
+--
 
--- User sessions for security
-CREATE TABLE user_sessions (
-    id VARCHAR(128) PRIMARY KEY,
-    user_id INT NOT NULL,
-    ip_address VARCHAR(45),
-    user_agent TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_activity TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-    expires_at DATETIME NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+INSERT INTO `deployment_locations` (`id`, `location_name`, `local_government`, `senatorial_zone`, `state_zone`, `address`, `coordinates`, `created_at`) VALUES
+(1, 'State Capital Command', 'Metropolis LGA', 'central', 'Zone A', NULL, NULL, '2025-07-27 13:51:29'),
+(2, 'Northern District Office', 'Northern LGA', 'north', 'Zone B', NULL, NULL, '2025-07-27 13:51:29'),
+(3, 'Southern District Office', 'Southern LGA', 'south', 'Zone C', NULL, NULL, '2025-07-27 13:51:29'),
+(4, 'Eastern Zone Command', 'Eastern LGA', 'central', 'Zone D', NULL, NULL, '2025-07-27 13:51:29'),
+(5, 'Western Zone Command', 'Western LGA', 'central', 'Zone E', NULL, NULL, '2025-07-27 13:51:29'),
+(6, 'Border Patrol Station North', 'Border LGA North', 'north', 'Zone F', NULL, NULL, '2025-07-27 13:51:29'),
+(7, 'Border Patrol Station South', 'Border LGA South', 'south', 'Zone G', NULL, NULL, '2025-07-27 13:51:29'),
+(8, 'Airport Security Unit', 'Airport LGA', 'central', 'Zone H', NULL, NULL, '2025-07-27 13:51:29');
 
--- Insert default users and sample data
-INSERT INTO users (username, email, password_hash, first_name, last_name, role) VALUES 
-('superadmin', 'superadmin@statefleet.gov', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Super', 'Administrator', 'super_admin'),
-('admin', 'admin@statefleet.gov', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'System', 'Administrator', 'admin'),
-('dataentry', 'dataentry@statefleet.gov', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Data Entry', 'Officer', 'data_entry_officer'),
-('guest', 'guest@statefleet.gov', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Guest', 'User', 'guest');
+-- --------------------------------------------------------
 
--- Insert sample agencies
-INSERT INTO agencies (agency_name, agency_code, agency_type, contact_person, contact_phone, headquarters_address) VALUES 
-('State Police Command', 'SPC', 'state', 'Commissioner of Police', '+234-xxx-xxx-xxxx', 'State Police Headquarters'),
-('Federal Road Safety Corps', 'FRSC', 'federal', 'Sector Commander', '+234-xxx-xxx-xxxx', 'FRSC State Command'),
-('Nigeria Security and Civil Defence Corps', 'NSCDC', 'federal', 'State Commandant', '+234-xxx-xxx-xxxx', 'NSCDC State Command'),
-('State Traffic Management Agency', 'STMA', 'state', 'General Manager', '+234-xxx-xxx-xxxx', 'STMA Headquarters'),
-('Nigeria Customs Service', 'NCS', 'federal', 'Area Controller', '+234-xxx-xxx-xxxx', 'Customs Area Command'),
-('Nigeria Immigration Service', 'NIS', 'federal', 'State Controller', '+234-xxx-xxx-xxxx', 'Immigration State Command'),
-('Department of State Services', 'DSS', 'federal', 'State Director', '+234-xxx-xxx-xxxx', 'DSS State Office'),
-('Nigeria Police Force Mobile Unit', 'MOPOL', 'federal', 'Unit Commander', '+234-xxx-xxx-xxxx', 'Mobile Police Base');
+--
+-- Table structure for table `drivers`
+--
 
--- Insert sample deployment locations
-INSERT INTO deployment_locations (location_name, local_government, senatorial_zone, state_zone) VALUES 
-('State Capital Command', 'Metropolis LGA', 'central', 'Zone A'),
-('Northern District Office', 'Northern LGA', 'north', 'Zone B'),
-('Southern District Office', 'Southern LGA', 'south', 'Zone C'),
-('Eastern Zone Command', 'Eastern LGA', 'central', 'Zone D'),
-('Western Zone Command', 'Western LGA', 'central', 'Zone E'),
-('Border Patrol Station North', 'Border LGA North', 'north', 'Zone F'),
-('Border Patrol Station South', 'Border LGA South', 'south', 'Zone G'),
-('Airport Security Unit', 'Airport LGA', 'central', 'Zone H');
+CREATE TABLE `drivers` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `license_number` varchar(30) NOT NULL,
+  `license_class` varchar(10) NOT NULL,
+  `license_expiry` date NOT NULL,
+  `hire_date` date NOT NULL,
+  `emergency_contact_name` varchar(100) DEFAULT NULL,
+  `emergency_contact_phone` varchar(20) DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `city` varchar(50) DEFAULT NULL,
+  `state` varchar(50) DEFAULT NULL,
+  `zip_code` varchar(10) DEFAULT NULL,
+  `status` enum('active','inactive','suspended','on_leave') DEFAULT 'active',
+  `rating` decimal(3,2) DEFAULT 5.00,
+  `total_trips` int(11) DEFAULT 0,
+  `total_distance` decimal(10,2) DEFAULT 0.00,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Create indexes for better performance
-CREATE INDEX idx_vehicles_status ON vehicles(status);
-CREATE INDEX idx_vehicles_type ON vehicles(vehicle_type);
-CREATE INDEX idx_trips_status ON trips(status);
-CREATE INDEX idx_trips_dates ON trips(planned_departure, planned_arrival);
-CREATE INDEX idx_notifications_user_read ON notifications(user_id, is_read);
-CREATE INDEX idx_maintenance_due_date ON maintenance_schedules(scheduled_date, status);
-CREATE INDEX idx_fuel_records_date ON fuel_records(fuel_date);
-CREATE INDEX idx_system_logs_created ON system_logs(created_at);
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `fuel_records`
+--
+
+CREATE TABLE `fuel_records` (
+  `id` int(11) NOT NULL,
+  `vehicle_id` int(11) NOT NULL,
+  `driver_id` int(11) NOT NULL,
+  `fuel_station` varchar(100) DEFAULT NULL,
+  `fuel_type` enum('gasoline','diesel','electric') NOT NULL,
+  `quantity` decimal(8,2) NOT NULL,
+  `price_per_unit` decimal(6,3) NOT NULL,
+  `total_cost` decimal(10,2) NOT NULL,
+  `mileage_at_fillup` int(11) NOT NULL,
+  `receipt_number` varchar(50) DEFAULT NULL,
+  `fuel_date` date NOT NULL,
+  `location` varchar(200) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `maintenance_history`
+--
+
+CREATE TABLE `maintenance_history` (
+  `id` int(11) NOT NULL,
+  `vehicle_id` int(11) NOT NULL,
+  `maintenance_schedule_id` int(11) DEFAULT NULL,
+  `maintenance_date` date NOT NULL,
+  `maintenance_category` enum('scheduled','unscheduled','overhaul') NOT NULL,
+  `work_performed` text NOT NULL,
+  `parts_used` text DEFAULT NULL,
+  `cost` decimal(10,2) DEFAULT NULL,
+  `mileage_at_service` int(11) DEFAULT NULL,
+  `service_provider` varchar(100) DEFAULT NULL,
+  `technician_name` varchar(100) DEFAULT NULL,
+  `before_condition` text DEFAULT NULL,
+  `after_condition` text DEFAULT NULL,
+  `warranty_period` int(11) DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `maintenance_schedules`
+--
+
+CREATE TABLE `maintenance_schedules` (
+  `id` int(11) NOT NULL,
+  `vehicle_id` int(11) NOT NULL,
+  `maintenance_category` enum('scheduled','unscheduled','overhaul') NOT NULL,
+  `maintenance_type` varchar(100) NOT NULL,
+  `description` text NOT NULL,
+  `scheduled_date` date NOT NULL,
+  `mileage_due` int(11) DEFAULT NULL,
+  `status` enum('scheduled','in_progress','completed','overdue','cancelled') DEFAULT 'scheduled',
+  `priority` enum('low','normal','high','critical') DEFAULT 'normal',
+  `estimated_cost` decimal(10,2) DEFAULT NULL,
+  `actual_cost` decimal(10,2) DEFAULT NULL,
+  `service_provider` varchar(100) DEFAULT NULL,
+  `work_order_number` varchar(50) DEFAULT NULL,
+  `parts_replaced` text DEFAULT NULL,
+  `labor_hours` decimal(5,2) DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  `completed_date` date DEFAULT NULL,
+  `next_service_date` date DEFAULT NULL,
+  `authorized_by` int(11) DEFAULT NULL,
+  `performed_by` varchar(100) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `notifications`
+--
+
+CREATE TABLE `notifications` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `type` enum('maintenance_due','trip_delay','vehicle_issue','document_expiry','fuel_alert','system') NOT NULL,
+  `title` varchar(200) NOT NULL,
+  `message` text NOT NULL,
+  `priority` enum('low','normal','high','urgent') DEFAULT 'normal',
+  `is_read` tinyint(1) DEFAULT 0,
+  `action_required` tinyint(1) DEFAULT 0,
+  `related_id` int(11) DEFAULT NULL,
+  `related_type` varchar(50) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `read_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `system_logs`
+--
+
+CREATE TABLE `system_logs` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `action` varchar(100) NOT NULL,
+  `entity_type` varchar(50) NOT NULL,
+  `entity_id` int(11) DEFAULT NULL,
+  `old_values` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`old_values`)),
+  `new_values` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`new_values`)),
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `trips`
+--
+
+CREATE TABLE `trips` (
+  `id` int(11) NOT NULL,
+  `trip_number` varchar(20) NOT NULL,
+  `vehicle_id` int(11) NOT NULL,
+  `driver_id` int(11) NOT NULL,
+  `route_name` varchar(100) DEFAULT NULL,
+  `start_location` varchar(200) NOT NULL,
+  `end_location` varchar(200) NOT NULL,
+  `planned_departure` datetime NOT NULL,
+  `planned_arrival` datetime NOT NULL,
+  `actual_departure` datetime DEFAULT NULL,
+  `actual_arrival` datetime DEFAULT NULL,
+  `start_mileage` int(11) DEFAULT NULL,
+  `end_mileage` int(11) DEFAULT NULL,
+  `distance_planned` decimal(8,2) DEFAULT NULL,
+  `distance_actual` decimal(8,2) DEFAULT NULL,
+  `fuel_consumed` decimal(8,2) DEFAULT NULL,
+  `status` enum('planned','in_progress','completed','cancelled','delayed') DEFAULT 'planned',
+  `priority` enum('low','normal','high','urgent') DEFAULT 'normal',
+  `cargo_description` text DEFAULT NULL,
+  `cargo_weight` decimal(8,2) DEFAULT NULL,
+  `special_instructions` text DEFAULT NULL,
+  `created_by` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `first_name` varchar(50) NOT NULL,
+  `last_name` varchar(50) NOT NULL,
+  `role` enum('super_admin','admin','data_entry_officer','guest') DEFAULT 'guest',
+  `phone` varchar(20) DEFAULT NULL,
+  `status` enum('active','inactive','suspended') DEFAULT 'active',
+  `last_login` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `first_name`, `last_name`, `role`, `phone`, `status`, `last_login`, `created_at`, `updated_at`) VALUES
+(1, 'superadmin', 'superadmin@statefleet.gov', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Super', 'Administrator', 'super_admin', NULL, 'active', NULL, '2025-07-27 13:51:29', '2025-07-27 13:51:29'),
+(2, 'admin', 'admin@statefleet.gov', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'System', 'Administrator', 'admin', NULL, 'active', NULL, '2025-07-27 13:51:29', '2025-07-27 13:51:29'),
+(3, 'dataentry', 'dataentry@statefleet.gov', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Data Entry', 'Officer', 'data_entry_officer', NULL, 'active', NULL, '2025-07-27 13:51:29', '2025-07-27 13:51:29'),
+(4, 'guest', 'guest@statefleet.gov', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Guest', 'User', 'guest', NULL, 'active', NULL, '2025-07-27 13:51:29', '2025-07-27 13:51:29');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_sessions`
+--
+
+CREATE TABLE `user_sessions` (
+  `id` varchar(128) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `last_activity` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `expires_at` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `vehicles`
+--
+
+CREATE TABLE `vehicles` (
+  `id` int(11) NOT NULL,
+  `vehicle_brand` varchar(50) NOT NULL,
+  `vehicle_model` varchar(50) NOT NULL,
+  `serial_number` varchar(30) NOT NULL,
+  `year_allotted` year(4) NOT NULL,
+  `year_manufactured` year(4) DEFAULT NULL,
+  `vehicle_type` enum('land','air','sea','drone','motorcycle','truck','van','car','bus','boat','helicopter','other') NOT NULL,
+  `fuel_type` enum('gasoline','diesel','electric','hybrid','jet_fuel','battery','other') NOT NULL,
+  `engine_number` varchar(50) DEFAULT NULL,
+  `chassis_number` varchar(50) DEFAULT NULL,
+  `license_plate` varchar(15) DEFAULT NULL,
+  `vin` varchar(17) DEFAULT NULL,
+  `tracker_number` varchar(50) DEFAULT NULL,
+  `tracker_imei` varchar(20) DEFAULT NULL,
+  `tracker_status` enum('active','inactive','not_installed') DEFAULT 'not_installed',
+  `agency_id` int(11) NOT NULL,
+  `deployment_location_id` int(11) NOT NULL,
+  `serviceability` enum('serviceable','unserviceable') DEFAULT 'serviceable',
+  `current_condition` text DEFAULT NULL,
+  `current_mileage` int(11) DEFAULT 0,
+  `purchase_date` date DEFAULT NULL,
+  `purchase_price` decimal(12,2) DEFAULT NULL,
+  `supplier` varchar(100) DEFAULT NULL,
+  `last_overhaul` date DEFAULT NULL,
+  `next_overhaul` date DEFAULT NULL,
+  `last_scheduled_maintenance` date DEFAULT NULL,
+  `next_scheduled_maintenance` date DEFAULT NULL,
+  `insurance_policy` varchar(50) DEFAULT NULL,
+  `insurance_expiry` date DEFAULT NULL,
+  `registration_expiry` date DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `status` enum('active','inactive','maintenance','decommissioned') DEFAULT 'active'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `vehicle_assignments`
+--
+
+CREATE TABLE `vehicle_assignments` (
+  `id` int(11) NOT NULL,
+  `vehicle_id` int(11) NOT NULL,
+  `driver_id` int(11) NOT NULL,
+  `assigned_date` date NOT NULL,
+  `unassigned_date` date DEFAULT NULL,
+  `status` enum('active','completed') DEFAULT 'active',
+  `notes` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `agencies`
+--
+ALTER TABLE `agencies`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `agency_code` (`agency_code`);
+
+--
+-- Indexes for table `deployment_locations`
+--
+ALTER TABLE `deployment_locations`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `drivers`
+--
+ALTER TABLE `drivers`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `license_number` (`license_number`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `fuel_records`
+--
+ALTER TABLE `fuel_records`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `vehicle_id` (`vehicle_id`),
+  ADD KEY `driver_id` (`driver_id`);
+
+--
+-- Indexes for table `maintenance_history`
+--
+ALTER TABLE `maintenance_history`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `vehicle_id` (`vehicle_id`),
+  ADD KEY `maintenance_schedule_id` (`maintenance_schedule_id`),
+  ADD KEY `created_by` (`created_by`);
+
+--
+-- Indexes for table `maintenance_schedules`
+--
+ALTER TABLE `maintenance_schedules`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `vehicle_id` (`vehicle_id`),
+  ADD KEY `authorized_by` (`authorized_by`);
+
+--
+-- Indexes for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `system_logs`
+--
+ALTER TABLE `system_logs`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `trips`
+--
+ALTER TABLE `trips`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `trip_number` (`trip_number`),
+  ADD KEY `vehicle_id` (`vehicle_id`),
+  ADD KEY `driver_id` (`driver_id`),
+  ADD KEY `created_by` (`created_by`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username` (`username`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
+-- Indexes for table `user_sessions`
+--
+ALTER TABLE `user_sessions`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `vehicles`
+--
+ALTER TABLE `vehicles`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `serial_number` (`serial_number`),
+  ADD KEY `agency_id` (`agency_id`),
+  ADD KEY `deployment_location_id` (`deployment_location_id`),
+  ADD KEY `idx_vehicles_status` (`status`);
+
+--
+-- Indexes for table `vehicle_assignments`
+--
+ALTER TABLE `vehicle_assignments`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `vehicle_id` (`vehicle_id`),
+  ADD KEY `driver_id` (`driver_id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `agencies`
+--
+ALTER TABLE `agencies`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `deployment_locations`
+--
+ALTER TABLE `deployment_locations`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `drivers`
+--
+ALTER TABLE `drivers`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `fuel_records`
+--
+ALTER TABLE `fuel_records`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `maintenance_history`
+--
+ALTER TABLE `maintenance_history`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `maintenance_schedules`
+--
+ALTER TABLE `maintenance_schedules`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `notifications`
+--
+ALTER TABLE `notifications`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `system_logs`
+--
+ALTER TABLE `system_logs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `trips`
+--
+ALTER TABLE `trips`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `vehicles`
+--
+ALTER TABLE `vehicles`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `vehicle_assignments`
+--
+ALTER TABLE `vehicle_assignments`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `drivers`
+--
+ALTER TABLE `drivers`
+  ADD CONSTRAINT `drivers_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `fuel_records`
+--
+ALTER TABLE `fuel_records`
+  ADD CONSTRAINT `fuel_records_ibfk_1` FOREIGN KEY (`vehicle_id`) REFERENCES `vehicles` (`id`),
+  ADD CONSTRAINT `fuel_records_ibfk_2` FOREIGN KEY (`driver_id`) REFERENCES `drivers` (`id`);
+
+--
+-- Constraints for table `maintenance_history`
+--
+ALTER TABLE `maintenance_history`
+  ADD CONSTRAINT `maintenance_history_ibfk_1` FOREIGN KEY (`vehicle_id`) REFERENCES `vehicles` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `maintenance_history_ibfk_2` FOREIGN KEY (`maintenance_schedule_id`) REFERENCES `maintenance_schedules` (`id`),
+  ADD CONSTRAINT `maintenance_history_ibfk_3` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `maintenance_schedules`
+--
+ALTER TABLE `maintenance_schedules`
+  ADD CONSTRAINT `maintenance_schedules_ibfk_1` FOREIGN KEY (`vehicle_id`) REFERENCES `vehicles` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `maintenance_schedules_ibfk_2` FOREIGN KEY (`authorized_by`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `system_logs`
+--
+ALTER TABLE `system_logs`
+  ADD CONSTRAINT `system_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `trips`
+--
+ALTER TABLE `trips`
+  ADD CONSTRAINT `trips_ibfk_1` FOREIGN KEY (`vehicle_id`) REFERENCES `vehicles` (`id`),
+  ADD CONSTRAINT `trips_ibfk_2` FOREIGN KEY (`driver_id`) REFERENCES `drivers` (`id`),
+  ADD CONSTRAINT `trips_ibfk_3` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `user_sessions`
+--
+ALTER TABLE `user_sessions`
+  ADD CONSTRAINT `user_sessions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `vehicles`
+--
+ALTER TABLE `vehicles`
+  ADD CONSTRAINT `vehicles_ibfk_1` FOREIGN KEY (`agency_id`) REFERENCES `agencies` (`id`),
+  ADD CONSTRAINT `vehicles_ibfk_2` FOREIGN KEY (`deployment_location_id`) REFERENCES `deployment_locations` (`id`);
+
+--
+-- Constraints for table `vehicle_assignments`
+--
+ALTER TABLE `vehicle_assignments`
+  ADD CONSTRAINT `vehicle_assignments_ibfk_1` FOREIGN KEY (`vehicle_id`) REFERENCES `vehicles` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `vehicle_assignments_ibfk_2` FOREIGN KEY (`driver_id`) REFERENCES `drivers` (`id`) ON DELETE CASCADE;
+
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

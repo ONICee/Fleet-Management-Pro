@@ -1,7 +1,7 @@
 <?php
 class Database {
     private $host = 'localhost';
-    private $db_name = 'fleet_management';
+    private $db_name = 'fleet_mgt';
     private $username = 'root';
     private $password = '';
     private $conn;

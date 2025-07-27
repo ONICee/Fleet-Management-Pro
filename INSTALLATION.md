@@ -51,30 +51,30 @@ The State Fleet Management System is an enterprise-grade application designed to
 
 2. Create the database:
    ```sql
-   CREATE DATABASE fleet_management CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   CREATE DATABASE fleet_mgt CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
    ```
 
 3. Create a dedicated database user:
    ```sql
    CREATE USER 'fleet_user'@'localhost' IDENTIFIED BY 'your_secure_password';
-   GRANT ALL PRIVILEGES ON fleet_management.* TO 'fleet_user'@'localhost';
+   GRANT ALL PRIVILEGES ON fleet_mgt.* TO 'fleet_user'@'localhost';
    FLUSH PRIVILEGES;
    ```
 
 4. Import the database schema:
    ```bash
-   mysql -u fleet_user -p fleet_management < database/schema.sql
+   mysql -u fleet_user -p fleet_mgt < database/schema.sql
    ```
 
    **Note**: If you encounter MySQL error #1067 with the user_sessions table, run the fix:
    ```bash
-   mysql -u fleet_user -p fleet_management < database/fix_user_sessions.sql
+   mysql -u fleet_user -p fleet_mgt < database/fix_user_sessions.sql
    ```
 
 #### Option B: Using Database Administration Tool
 
 1. Open phpMyAdmin or your preferred database tool
-2. Create a new database named `fleet_management`
+2. Create a new database named `fleet_mgt`
 3. Set charset to `utf8mb4` and collation to `utf8mb4_unicode_ci`
 4. Import the `database/schema.sql` file
 
@@ -86,7 +86,7 @@ The State Fleet Management System is an enterprise-grade application designed to
 2. Update the database connection settings:
    ```php
    private $host = 'localhost';           // Your database host
-   private $db_name = 'fleet_management'; // Your database name
+   private $db_name = 'fleet_mgt';        // Your database name
    private $username = 'fleet_user';      // Your database username
    private $password = 'your_password';   // Your database password
    ```
@@ -241,7 +241,7 @@ The system comes with pre-configured user accounts for different roles:
 
 #### 2. MySQL Error #1067 (Invalid default value for 'expires_at')
 This occurs on some MySQL/MariaDB versions with timestamp handling:
-- Run the fix script: `mysql -u fleet_user -p fleet_management < database/fix_user_sessions.sql`
+- Run the fix script: `mysql -u fleet_user -p fleet_mgt < database/fix_user_sessions.sql`
 - Or manually execute the commands in `database/fix_user_sessions.sql`
 - This recreates the user_sessions table with proper column definitions
 

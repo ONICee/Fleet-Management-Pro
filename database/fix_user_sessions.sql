@@ -1,5 +1,8 @@
 -- Fix for user_sessions table timestamp issue
 -- Run this if you encountered the #1067 error during initial installation
+-- Database: fleet_mgt
+
+USE fleet_mgt;
 
 -- Drop the problematic table if it exists
 DROP TABLE IF EXISTS user_sessions;
