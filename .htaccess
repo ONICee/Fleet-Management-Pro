@@ -66,7 +66,12 @@ AddDefaultCharset UTF-8
 # Disable directory browsing
 Options -Indexes
 
-# Custom error pages
+# Custom error pages (adjust paths for subdirectory if needed)
 ErrorDocument 404 /views/errors/404.php
 ErrorDocument 403 /views/errors/403.php
 ErrorDocument 500 /views/errors/500.php
+
+# For subdirectory installations, uncomment and adjust the lines below:
+# ErrorDocument 404 /fmpro/views/errors/404.php
+# ErrorDocument 403 /fmpro/views/errors/403.php
+# ErrorDocument 500 /fmpro/views/errors/500.php

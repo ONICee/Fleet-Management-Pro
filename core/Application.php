@@ -112,6 +112,20 @@ class Application {
                 $uri = substr($uri, 0, $pos);
             }
             
+            // Handle subdirectory installations
+            $scriptName = $_SERVER['SCRIPT_NAME'];
+            $basePath = dirname($scriptName);
+            
+            // Remove base path from URI if running in subdirectory
+            if ($basePath !== '/' && strpos($uri, $basePath) === 0) {
+                $uri = substr($uri, strlen($basePath));
+            }
+            
+            // Ensure URI starts with /
+            if (empty($uri) || $uri[0] !== '/') {
+                $uri = '/' . $uri;
+            }
+            
             $this->router->dispatch($uri, $method, $this->db, $this->session);
             
         } catch (Exception $e) {

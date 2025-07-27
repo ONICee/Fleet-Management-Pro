@@ -13,6 +13,7 @@ define('APP_VERSION', '1.0.0');
 ob_start();
 
 // Include required core files
+require_once __DIR__ . '/core/helpers.php';
 require_once __DIR__ . '/core/Application.php';
 require_once __DIR__ . '/core/Router.php';
 require_once __DIR__ . '/core/Session.php';

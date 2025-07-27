@@ -58,7 +58,11 @@ class BaseController {
     }
     
     protected function redirect($url) {
-        header("Location: $url");
+        if (function_exists('url')) {
+            header("Location: " . url($url));
+        } else {
+            header("Location: $url");
+        }
         exit;
     }
     
