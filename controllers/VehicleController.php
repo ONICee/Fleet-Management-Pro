@@ -168,8 +168,10 @@ class VehicleController extends BaseController {
         
         $vehicle = $vehicles[0];
         
-        // Get maintenance history
-        $maintenanceHistory = $vehicleModel->getMaintenanceHistory($id);
+        // Get maintenance history using the new model
+        require_once __DIR__ . '/../models/MaintenanceHistory.php';
+        $maintenanceHistoryModel = new MaintenanceHistory($this->db);
+        $maintenanceHistory = $maintenanceHistoryModel->getVehicleMaintenanceHistory($id, 10);
         
         $data = [
             'pageTitle' => 'Vehicle Details - State Fleet Management System',
