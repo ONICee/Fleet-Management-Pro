@@ -17,6 +17,7 @@ class Application {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
+        require_once __DIR__ . '/Session.php';
         $this->session = new Session();
     }
     
@@ -26,6 +27,7 @@ class Application {
     }
     
     private function initializeRouter() {
+        require_once __DIR__ . '/Router.php';
         $this->router = new Router();
         $this->setupRoutes();
     }
