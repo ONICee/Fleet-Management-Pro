@@ -12,7 +12,7 @@ CREATE TABLE users (
     password_hash VARCHAR(255) NOT NULL,
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
-    role ENUM('admin', 'manager', 'dispatcher', 'driver') DEFAULT 'driver',
+    role ENUM('super_admin', 'admin', 'data_entry_officer', 'guest') DEFAULT 'guest',
     phone VARCHAR(20),
     status ENUM('active', 'inactive', 'suspended') DEFAULT 'active',
     last_login TIMESTAMP NULL,
@@ -20,29 +20,84 @@ CREATE TABLE users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Vehicles table
+-- Agencies table for state security and related agencies
+CREATE TABLE agencies (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    agency_name VARCHAR(100) NOT NULL,
+    agency_code VARCHAR(20) UNIQUE NOT NULL,
+    agency_type ENUM('federal', 'state', 'local') NOT NULL,
+    contact_person VARCHAR(100),
+    contact_phone VARCHAR(20),
+    contact_email VARCHAR(100),
+    headquarters_address TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Locations/Deployment areas within the state
+CREATE TABLE deployment_locations (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    location_name VARCHAR(100) NOT NULL,
+    local_government VARCHAR(50),
+    senatorial_zone ENUM('north', 'central', 'south'),
+    state_zone VARCHAR(50),
+    address TEXT,
+    coordinates VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Vehicles table (Enhanced for state specifications)
 CREATE TABLE vehicles (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    vehicle_number VARCHAR(20) UNIQUE NOT NULL,
-    make VARCHAR(50) NOT NULL,
-    model VARCHAR(50) NOT NULL,
-    year YEAR NOT NULL,
-    vin VARCHAR(17) UNIQUE,
-    license_plate VARCHAR(15) UNIQUE NOT NULL,
-    vehicle_type ENUM('truck', 'van', 'car', 'motorcycle', 'bus') NOT NULL,
-    fuel_type ENUM('gasoline', 'diesel', 'electric', 'hybrid') NOT NULL,
-    capacity_weight DECIMAL(8,2),
-    capacity_volume DECIMAL(8,2),
+    vehicle_brand VARCHAR(50) NOT NULL,
+    vehicle_model VARCHAR(50) NOT NULL,
+    serial_number VARCHAR(30) UNIQUE NOT NULL, -- State-allotted serial number
+    year_allotted YEAR NOT NULL,
+    year_manufactured YEAR,
+    vehicle_type ENUM('land', 'air', 'sea', 'drone', 'motorcycle', 'truck', 'van', 'car', 'bus', 'boat', 'helicopter', 'other') NOT NULL,
+    fuel_type ENUM('gasoline', 'diesel', 'electric', 'hybrid', 'jet_fuel', 'battery', 'other') NOT NULL,
+    
+    -- Vehicle identification details
+    engine_number VARCHAR(50),
+    chassis_number VARCHAR(50),
+    license_plate VARCHAR(15),
+    vin VARCHAR(17),
+    
+    -- Tracker information
+    tracker_number VARCHAR(50),
+    tracker_imei VARCHAR(20),
+    tracker_status ENUM('active', 'inactive', 'not_installed') DEFAULT 'not_installed',
+    
+    -- Assignment details
+    agency_id INT NOT NULL,
+    deployment_location_id INT NOT NULL,
+    
+    -- Serviceability status
+    serviceability ENUM('serviceable', 'unserviceable') DEFAULT 'serviceable',
+    current_condition TEXT,
+    current_mileage INT DEFAULT 0,
+    
+    -- Purchase/Acquisition details
     purchase_date DATE,
     purchase_price DECIMAL(12,2),
-    current_mileage INT DEFAULT 0,
-    status ENUM('active', 'maintenance', 'retired', 'accident') DEFAULT 'active',
-    gps_device_id VARCHAR(50),
+    supplier VARCHAR(100),
+    
+    -- Maintenance tracking
+    last_overhaul DATE NULL,
+    next_overhaul DATE NULL,
+    last_scheduled_maintenance DATE NULL,
+    next_scheduled_maintenance DATE NULL,
+    
+    -- Insurance and registration
     insurance_policy VARCHAR(50),
     insurance_expiry DATE,
     registration_expiry DATE,
+    
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (agency_id) REFERENCES agencies(id),
+    FOREIGN KEY (deployment_location_id) REFERENCES deployment_locations(id)
 );
 
 -- Drivers table
@@ -113,11 +168,12 @@ CREATE TABLE trips (
     FOREIGN KEY (created_by) REFERENCES users(id)
 );
 
--- Maintenance schedules and records
+-- Maintenance schedules and records (Enhanced for state specifications)
 CREATE TABLE maintenance_schedules (
     id INT PRIMARY KEY AUTO_INCREMENT,
     vehicle_id INT NOT NULL,
-    maintenance_type ENUM('oil_change', 'tire_rotation', 'brake_check', 'engine_tune', 'inspection', 'other') NOT NULL,
+    maintenance_category ENUM('scheduled', 'unscheduled', 'overhaul') NOT NULL,
+    maintenance_type VARCHAR(100) NOT NULL,
     description TEXT NOT NULL,
     scheduled_date DATE NOT NULL,
     mileage_due INT,
@@ -126,11 +182,41 @@ CREATE TABLE maintenance_schedules (
     estimated_cost DECIMAL(10,2),
     actual_cost DECIMAL(10,2),
     service_provider VARCHAR(100),
+    work_order_number VARCHAR(50),
+    parts_replaced TEXT,
+    labor_hours DECIMAL(5,2),
     notes TEXT,
     completed_date DATE NULL,
+    next_service_date DATE NULL,
+    authorized_by INT,
+    performed_by VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE
+    FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE,
+    FOREIGN KEY (authorized_by) REFERENCES users(id)
+);
+
+-- Vehicle maintenance history for detailed tracking
+CREATE TABLE maintenance_history (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    vehicle_id INT NOT NULL,
+    maintenance_schedule_id INT,
+    maintenance_date DATE NOT NULL,
+    maintenance_category ENUM('scheduled', 'unscheduled', 'overhaul') NOT NULL,
+    work_performed TEXT NOT NULL,
+    parts_used TEXT,
+    cost DECIMAL(10,2),
+    mileage_at_service INT,
+    service_provider VARCHAR(100),
+    technician_name VARCHAR(100),
+    before_condition TEXT,
+    after_condition TEXT,
+    warranty_period INT, -- in months
+    created_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE,
+    FOREIGN KEY (maintenance_schedule_id) REFERENCES maintenance_schedules(id),
+    FOREIGN KEY (created_by) REFERENCES users(id)
 );
 
 -- Fuel records
@@ -196,9 +282,34 @@ CREATE TABLE user_sessions (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Insert default admin user
+-- Insert default users and sample data
 INSERT INTO users (username, email, password_hash, first_name, last_name, role) VALUES 
-('admin', 'admin@fleetmanagement.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'System', 'Administrator', 'admin');
+('superadmin', 'superadmin@statefleet.gov', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Super', 'Administrator', 'super_admin'),
+('admin', 'admin@statefleet.gov', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'System', 'Administrator', 'admin'),
+('dataentry', 'dataentry@statefleet.gov', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Data Entry', 'Officer', 'data_entry_officer'),
+('guest', 'guest@statefleet.gov', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Guest', 'User', 'guest');
+
+-- Insert sample agencies
+INSERT INTO agencies (agency_name, agency_code, agency_type, contact_person, contact_phone, headquarters_address) VALUES 
+('State Police Command', 'SPC', 'state', 'Commissioner of Police', '+234-xxx-xxx-xxxx', 'State Police Headquarters'),
+('Federal Road Safety Corps', 'FRSC', 'federal', 'Sector Commander', '+234-xxx-xxx-xxxx', 'FRSC State Command'),
+('Nigeria Security and Civil Defence Corps', 'NSCDC', 'federal', 'State Commandant', '+234-xxx-xxx-xxxx', 'NSCDC State Command'),
+('State Traffic Management Agency', 'STMA', 'state', 'General Manager', '+234-xxx-xxx-xxxx', 'STMA Headquarters'),
+('Nigeria Customs Service', 'NCS', 'federal', 'Area Controller', '+234-xxx-xxx-xxxx', 'Customs Area Command'),
+('Nigeria Immigration Service', 'NIS', 'federal', 'State Controller', '+234-xxx-xxx-xxxx', 'Immigration State Command'),
+('Department of State Services', 'DSS', 'federal', 'State Director', '+234-xxx-xxx-xxxx', 'DSS State Office'),
+('Nigeria Police Force Mobile Unit', 'MOPOL', 'federal', 'Unit Commander', '+234-xxx-xxx-xxxx', 'Mobile Police Base');
+
+-- Insert sample deployment locations
+INSERT INTO deployment_locations (location_name, local_government, senatorial_zone, state_zone) VALUES 
+('State Capital Command', 'Metropolis LGA', 'central', 'Zone A'),
+('Northern District Office', 'Northern LGA', 'north', 'Zone B'),
+('Southern District Office', 'Southern LGA', 'south', 'Zone C'),
+('Eastern Zone Command', 'Eastern LGA', 'central', 'Zone D'),
+('Western Zone Command', 'Western LGA', 'central', 'Zone E'),
+('Border Patrol Station North', 'Border LGA North', 'north', 'Zone F'),
+('Border Patrol Station South', 'Border LGA South', 'south', 'Zone G'),
+('Airport Security Unit', 'Airport LGA', 'central', 'Zone H');
 
 -- Create indexes for better performance
 CREATE INDEX idx_vehicles_status ON vehicles(status);
