@@ -280,6 +280,46 @@ if (!function_exists('url')) {
             height: 60px;
         }
 
+        .flash-messages-container {
+            position: fixed;
+            top: 90px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 400px;
+        }
+
+        .flash-alert {
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border: none;
+            font-weight: 500;
+        }
+
+        .flash-alert.alert-success {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            border-left: 4px solid #fff;
+            color: white;
+        }
+
+        .flash-alert.alert-error,
+        .flash-alert.alert-danger {
+            background: linear-gradient(45deg, #dc3545, #e74c3c);
+            border-left: 4px solid #fff;
+            color: white;
+        }
+
+        .flash-alert.alert-warning {
+            background: linear-gradient(45deg, #ffc107, #ffb300);
+            border-left: 4px solid #fff;
+            color: #212529;
+        }
+
+        .flash-alert.alert-info {
+            background: linear-gradient(45deg, #17a2b8, #138496);
+            border-left: 4px solid #fff;
+            color: white;
+        }
+
         .text-gold {
             color: var(--primary-gold) !important;
         }
@@ -405,9 +445,9 @@ if (!function_exists('url')) {
 
     <!-- Flash Messages -->
     <?php if (!empty($flashMessages)): ?>
-        <div class="container-fluid mt-3">
+        <div class="flash-messages-container">
             <?php foreach ($flashMessages as $message): ?>
-                <div class="alert alert-<?= $message['type'] ?> alert-dismissible fade show" role="alert">
+                <div class="alert alert-<?= $message['type'] ?> alert-dismissible fade show flash-alert" role="alert">
                     <?php
                     $icon = [
                         'success' => 'fas fa-check-circle',
@@ -418,7 +458,7 @@ if (!function_exists('url')) {
                     ?>
                     <i class="<?= $icon ?> me-2"></i>
                     <?= htmlspecialchars($message['message']) ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
                 </div>
             <?php endforeach; ?>
         </div>
