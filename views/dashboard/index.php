@@ -6,9 +6,9 @@
                     <i class="fas fa-tachometer-alt me-2"></i>
                     Dashboard
                 </h1>
-                <div class="text-muted">
-                    <i class="fas fa-calendar me-1"></i>
-                    <?= date('l, F j, Y') ?>
+                <div class="text-light">
+                    <i class="fas fa-calendar me-1 text-warning"></i>
+                    <span class="fw-bold"><?= date('l, F j, Y') ?></span>
                 </div>
             </div>
         </div>
@@ -46,83 +46,91 @@
     <!-- Statistics Cards -->
     <div class="row mb-4">
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card bg-dark border-warning h-100">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Total Vehicles
+            <a href="<?= url('/vehicles') ?>" class="text-decoration-none">
+                <div class="card bg-dark border-warning h-100 card-hover">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                    Total Vehicles
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-light">
+                                    <?= $vehicleStats['total'] ?? 0 ?>
+                                </div>
                             </div>
-                            <div class="h5 mb-0 font-weight-bold text-light">
-                                <?= $vehicleStats['total'] ?? 0 ?>
+                            <div class="col-auto">
+                                <i class="fas fa-car fa-2x text-warning"></i>
                             </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-car fa-2x text-warning"></i>
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
 
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card bg-dark border-success h-100">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Serviceable
+            <a href="<?= url('/vehicles?filter=serviceable') ?>" class="text-decoration-none">
+                <div class="card bg-dark border-success h-100 card-hover">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                    Serviceable
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-light">
+                                    <?= $vehicleStats['serviceable'] ?? 0 ?>
+                                </div>
                             </div>
-                            <div class="h5 mb-0 font-weight-bold text-light">
-                                <?= $vehicleStats['serviceable'] ?? 0 ?>
+                            <div class="col-auto">
+                                <i class="fas fa-check-circle fa-2x text-success"></i>
                             </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-check-circle fa-2x text-success"></i>
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
 
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card bg-dark border-danger h-100">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                                Unserviceable
+            <a href="<?= url('/vehicles?filter=unserviceable') ?>" class="text-decoration-none">
+                <div class="card bg-dark border-danger h-100 card-hover">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                    Unserviceable
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-light">
+                                    <?= $vehicleStats['unserviceable'] ?? 0 ?>
+                                </div>
                             </div>
-                            <div class="h5 mb-0 font-weight-bold text-light">
-                                <?= $vehicleStats['unserviceable'] ?? 0 ?>
+                            <div class="col-auto">
+                                <i class="fas fa-exclamation-triangle fa-2x text-danger"></i>
                             </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-exclamation-triangle fa-2x text-danger"></i>
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
 
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card bg-dark border-info h-100">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                Agencies
+            <a href="<?= url('/agencies') ?>" class="text-decoration-none">
+                <div class="card bg-dark border-info h-100 card-hover">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                    Agencies
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-light">
+                                    <?= $agencyStats['total'] ?? 0 ?>
+                                </div>
                             </div>
-                            <div class="h5 mb-0 font-weight-bold text-light">
-                                <?= $agencyStats['total'] ?? 0 ?>
+                            <div class="col-auto">
+                                <i class="fas fa-building fa-2x text-info"></i>
                             </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-building fa-2x text-info"></i>
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
     </div>
 
@@ -214,6 +222,23 @@
         </div>
     </div>
 </div>
+
+<style>
+.card-hover {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(255, 215, 0, 0.2);
+    border-color: #FFD700 !important;
+}
+
+.card-hover:hover .card-body {
+    background: linear-gradient(45deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
+}
+</style>
 
 <script>
 // Dashboard initialization

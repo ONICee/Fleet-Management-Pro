@@ -39,12 +39,29 @@ if (!function_exists('url')) {
             color: var(--text-light);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .main-wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        .content-wrapper {
+            display: flex;
+            flex: 1;
         }
 
         .navbar {
             background: linear-gradient(90deg, var(--primary-black) 0%, var(--secondary-black) 100%);
             border-bottom: 2px solid var(--primary-gold);
             box-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1030;
         }
 
         .navbar-brand {
@@ -70,9 +87,15 @@ if (!function_exists('url')) {
 
         .sidebar {
             background: linear-gradient(180deg, var(--secondary-black) 0%, var(--primary-black) 100%);
-            min-height: calc(100vh - 76px);
+            height: calc(100vh - 76px);
             border-right: 1px solid var(--light-black);
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+            position: fixed;
+            top: 76px;
+            left: 0;
+            width: 250px;
+            overflow-y: auto;
+            z-index: 1020;
         }
 
         .sidebar .nav-link {
@@ -99,8 +122,11 @@ if (!function_exists('url')) {
 
         .main-content {
             background: rgba(26, 26, 26, 0.95);
-            min-height: calc(100vh - 76px);
+            height: calc(100vh - 136px);
             border-radius: 15px 0 0 0;
+            margin-left: 250px;
+            margin-top: 76px;
+            overflow-y: auto;
             padding: 20px;
         }
 
@@ -246,7 +272,12 @@ if (!function_exists('url')) {
             background: linear-gradient(90deg, var(--primary-black), var(--secondary-black));
             border-top: 1px solid var(--primary-gold);
             padding: 20px 0;
-            margin-top: 40px;
+            position: fixed;
+            bottom: 0;
+            left: 250px;
+            right: 0;
+            z-index: 1010;
+            height: 60px;
         }
 
         .text-gold {
@@ -393,13 +424,10 @@ if (!function_exists('url')) {
         </div>
     <?php endif; ?>
 
-    <!-- Main Content -->
-    <div class="container-fluid">
-        <div class="row">
-            <?php if (isset($user) && $user && !isset($hideNav)): ?>
-            <!-- Sidebar -->
-            <div class="col-md-3 col-lg-2 px-0">
-                <div class="sidebar">
+    <!-- Main Content Wrapper -->
+    <?php if (isset($user) && $user && !isset($hideNav)): ?>
+    <!-- Sidebar -->
+    <div class="sidebar">
                     <nav class="nav flex-column py-3">
                         <a class="nav-link" href="<?= url('/dashboard') ?>">
                             <i class="fas fa-tachometer-alt me-2"></i> Dashboard
@@ -439,23 +467,19 @@ if (!function_exists('url')) {
                             <i class="fas fa-bell me-2"></i> Notifications
                         </a>
                     </nav>
-                </div>
-            </div>
-            
-            <!-- Main Content Area -->
-            <div class="col-md-9 col-lg-10">
-                <div class="main-content">
-                    <?= $content ?>
-                </div>
-            </div>
-            <?php else: ?>
-            <!-- Full width for login and other auth pages -->
-            <div class="col-12">
-                <?= $content ?>
-            </div>
-            <?php endif; ?>
-        </div>
+                </nav>
     </div>
+    
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <?= $content ?>
+    </div>
+    <?php else: ?>
+    <!-- Full width for login and other auth pages -->
+    <div class="container-fluid" style="margin-top: 76px;">
+        <?= $content ?>
+    </div>
+    <?php endif; ?>
 
     <!-- Footer -->
     <?php if (isset($user) && $user): ?>
