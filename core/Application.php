@@ -77,6 +77,15 @@ class Application {
         $this->router->add('/fuel/record', 'FuelController@record');
         $this->router->add('/fuel/edit/{id}', 'FuelController@edit');
         
+        // Agency routes
+        $this->router->add('/agencies', 'AgencyController@index');
+        $this->router->add('/agencies/create', 'AgencyController@create');
+        $this->router->add('/agencies/edit/{id}', 'AgencyController@edit');
+        $this->router->add('/agencies/view/{id}', 'AgencyController@view');
+        
+        // System logs routes
+        $this->router->add('/system-logs', 'SystemLogController@index');
+        
         // User management routes
         $this->router->add('/users', 'UserController@index');
         $this->router->add('/users/create', 'UserController@create');
