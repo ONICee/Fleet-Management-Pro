@@ -195,6 +195,18 @@
                                         <?php endif; ?>
                                     </td>
                                 </tr>
+                                <?php if (!empty($vehicle['current_lat']) && !empty($vehicle['current_lng'])): ?>
+                                <tr>
+                                    <td class="text-success fw-bold">Last Location:</td>
+                                    <td class="text-light">
+                                        <?= htmlspecialchars($vehicle['current_lat']) ?>, <?= htmlspecialchars($vehicle['current_lng']) ?>
+                                        <a href="<?= map_link($vehicle['current_lat'],$vehicle['current_lng']) ?>" target="_blank" class="ms-2 text-warning">
+                                            <i class="fas fa-map-marker-alt"></i> View Map
+                                        </a><br>
+                                        <small class="text-muted">Updated: <?= formatDate($vehicle['last_fix_at'],'M j, Y H:i') ?></small>
+                                    </td>
+                                </tr>
+                                <?php endif; ?>
                             </table>
                         </div>
                     </div>

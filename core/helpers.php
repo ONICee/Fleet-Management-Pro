@@ -88,3 +88,11 @@ function formatDate($date, $format = 'Y-m-d H:i:s') {
 function formatCurrency($amount, $currency = 'NGN') {
     return $currency . ' ' . number_format($amount, 2);
 }
+
+/**
+ * Generate a Google Maps link from coordinates
+ */
+function map_link($lat, $lng) {
+    if ($lat === null || $lng === null) return '';
+    return 'https://www.google.com/maps?q=' . $lat . ',' . $lng;
+}

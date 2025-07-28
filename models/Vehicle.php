@@ -9,7 +9,9 @@ class Vehicle extends BaseModel {
         'tracker_number', 'tracker_imei', 'tracker_status', 'agency_id', 'deployment_location_id',
         'serviceability', 'current_condition', 'current_mileage', 'purchase_date', 'purchase_price',
         'supplier', 'last_overhaul', 'next_overhaul', 'last_scheduled_maintenance', 
-        'next_scheduled_maintenance', 'insurance_policy', 'insurance_expiry', 'registration_expiry'
+        'next_scheduled_maintenance', 'insurance_policy', 'insurance_expiry', 'registration_expiry',
+        // Live location fields (added 2025-07-28)
+        'current_lat', 'current_lng', 'last_fix_at'
     ];
     
     public function createVehicle($data) {
@@ -284,6 +286,18 @@ class Vehicle extends BaseModel {
             }
         }
         
+        return $this->update($vehicleId, $data);
+    }
+
+    /**
+     * Update the live GPS location of a vehicle. Returns bool success.
+     */
+    public function updateLocation($vehicleId, $lat, $lng, $fixTime = null) {
+        $data = [
+            'current_lat' => $lat,
+            'current_lng' => $lng,
+            'last_fix_at' => $fixTime ?: date('Y-m-d H:i:s')
+        ];
         return $this->update($vehicleId, $data);
     }
     
