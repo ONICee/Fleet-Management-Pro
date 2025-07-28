@@ -110,6 +110,10 @@ class Application {
         $this->router->add('/reports/fuel', 'ReportController@fuel');
         $this->router->add('/reports/maintenance', 'ReportController@maintenance');
         $this->router->add('/reports/trips', 'ReportController@trips');
+        
+        // Settings routes (super admin)
+        $this->router->add('/settings', 'SettingsController@index');
+        $this->router->add('/settings/update', 'SettingsController@update');
     }
     
     public function run() {

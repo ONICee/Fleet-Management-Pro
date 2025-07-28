@@ -501,6 +501,9 @@ if (!function_exists('url')) {
                         <a class="nav-link" href="<?= url('/system-logs') ?>">
                             <i class="fas fa-history me-2"></i> System Logs
                         </a>
+                        <a class="nav-link" href="<?= url('/settings') ?>">
+                            <i class="fas fa-cog me-2"></i> Settings
+                        </a>
                         <?php endif; ?>
                         
                         <a class="nav-link" href="<?= url('/notifications') ?>">
