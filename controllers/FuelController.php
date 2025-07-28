@@ -44,11 +44,58 @@ class FuelController extends BaseController {
     public function record() {
         $this->requireLogin();
         $this->requireAnyRole(['super_admin', 'admin', 'data_entry_officer']);
-        
+
+        require_once __DIR__ . '/../models/Vehicle.php';
+        require_once __DIR__ . '/../models/Driver.php';
+        require_once __DIR__ . '/../models/FuelRecord.php';
+
+        $vehicleModel = new Vehicle($this->db);
+        $driverModel  = new Driver($this->db);
+        $fuelModel    = new FuelRecord($this->db);
+
+        if ($this->isPost()) {
+            $this->validateCSRF();
+
+            $input = $this->sanitizeInput($_POST);
+
+            // Calculate total cost if not provided / trusted from UI
+            $input['total_cost'] = (float)$input['quantity'] * (float)$input['price_per_unit'];
+
+            // Validation rules
+            $rules = [
+                'vehicle_id'      => 'required|numeric',
+                'fuel_station'    => 'required|max:100',
+                'fuel_type'       => 'required',
+                'quantity'        => 'required|numeric',
+                'price_per_unit'  => 'required|numeric',
+                'fuel_date'       => 'required|date'
+            ];
+
+            $errors = $this->validateInput($input, $rules);
+
+            if (!empty($errors)) {
+                $this->session->setFlashMessage('error', 'Please correct the highlighted errors.');
+                $this->redirect('/fuel/record');
+            }
+
+            try {
+                $fuelModel->createFuelRecord($input);
+                $this->logActivity('create','fuel_record',null,null,$input);
+                $this->session->setFlashMessage('success','Fuel record added successfully.');
+                $this->redirect('/fuel');
+            } catch (Exception $e) {
+                $this->session->setFlashMessage('error','Failed to save record: '.$e->getMessage());
+                $this->redirect('/fuel/record');
+            }
+        }
+
+        // GET request – show form
         $data = [
-            'pageTitle' => 'Record Fuel - State Fleet Management System'
+            'pageTitle' => 'Record Fuel - State Fleet Management System',
+            'vehicles'  => $vehicleModel->findAll([], 'vehicle_brand'),
+            'drivers'   => $driverModel->findAll([], 'id')
         ];
-        
+
         $this->renderView('fuel/record', $data);
     }
 }
