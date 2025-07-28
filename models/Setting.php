@@ -3,9 +3,27 @@
 class Setting {
     private $db;
     private $table = 'settings';
+    private $tableChecked = false;
 
     public function __construct($db) {
         $this->db = $db;
+        $this->ensureTableExists();
+    }
+
+    private function ensureTableExists() {
+        if ($this->tableChecked) return;
+        try {
+            $this->db->query("SELECT 1 FROM {$this->table} LIMIT 1");
+        } catch (PDOException $e) {
+            // 42S02: base table not found
+            if ($e->getCode() === '42S02') {
+                $sql = "CREATE TABLE IF NOT EXISTS {$this->table} (\n                    `key` varchar(100) NOT NULL PRIMARY KEY,\n                    `value` text NULL,\n                    `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+                $this->db->exec($sql);
+            } else {
+                throw $e;
+            }
+        }
+        $this->tableChecked = true;
     }
 
     /**

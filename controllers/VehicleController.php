@@ -159,7 +159,7 @@ class VehicleController extends BaseController {
         }
         
         $vehicleModel = new Vehicle($this->db);
-        $vehicles = $vehicleModel->getVehiclesWithDetails(['v.id' => $id]);
+        $vehicles = $vehicleModel->getVehiclesWithDetails(['id' => $id]);
         
         if (empty($vehicles)) {
             $this->session->setFlashMessage('error', 'Vehicle not found');
