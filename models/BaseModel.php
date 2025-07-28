@@ -6,8 +6,11 @@ class BaseModel {
     protected $fillable = [];
     protected $timestamps = true;
     
-    public function __construct($db) {
+    public function __construct($db, $table = null) {
         $this->db = $db;
+        if ($table !== null) {
+            $this->table = $table;
+        }
     }
     
     public function find($id) {
