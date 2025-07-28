@@ -573,7 +573,7 @@ if (!function_exists('url')) {
                         countElement.style.display = 'inline';
                         
                         listElement.innerHTML = data.notifications.map(notification => 
-                            `<li><a class="dropdown-item text-light" href="/notifications">
+                            `<li><a class="dropdown-item text-light" href="<?= url('/notifications') ?>">
                                 <small class="text-gold">${notification.type}</small><br>
                                 ${notification.title}
                             </a></li>`
