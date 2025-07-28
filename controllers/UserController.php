@@ -191,4 +191,55 @@ class UserController extends BaseController {
         
         $this->redirect('/users');
     }
+    
+    public function changePassword() {
+        $this->requireLogin();
+        $currentUser = $this->getUser();
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $currentPassword = trim($_POST['current_password'] ?? '');
+            $newPassword = trim($_POST['new_password'] ?? '');
+            $confirmPassword = trim($_POST['confirm_password'] ?? '');
+            
+            // Validation
+            if (empty($currentPassword) || empty($newPassword) || empty($confirmPassword)) {
+                $this->session->setFlashMessage('error', 'All fields are required');
+                $this->redirect('/users/change-password');
+            }
+            
+            if ($newPassword !== $confirmPassword) {
+                $this->session->setFlashMessage('error', 'New passwords do not match');
+                $this->redirect('/users/change-password');
+            }
+            
+            if (strlen($newPassword) < 6) {
+                $this->session->setFlashMessage('error', 'New password must be at least 6 characters long');
+                $this->redirect('/users/change-password');
+            }
+            
+            try {
+                $userModel = new User($this->db);
+                $result = $userModel->changePassword($currentUser['id'], $currentPassword, $newPassword);
+                
+                if ($result) {
+                    $this->logActivity('update', 'user_password', $currentUser['id']);
+                    $this->session->setFlashMessage('success', 'Password changed successfully!');
+                    $this->redirect('/users/profile');
+                } else {
+                    $this->session->setFlashMessage('error', 'Current password is incorrect');
+                    $this->redirect('/users/change-password');
+                }
+                
+            } catch (Exception $e) {
+                $this->session->setFlashMessage('error', 'Failed to change password: ' . $e->getMessage());
+                $this->redirect('/users/change-password');
+            }
+        }
+        
+        // Show change password form
+        $this->render('users/change-password', [
+            'pageTitle' => 'Change Password',
+            'user' => $currentUser
+        ]);
+    }
 }

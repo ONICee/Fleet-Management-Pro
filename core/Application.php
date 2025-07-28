@@ -92,6 +92,7 @@ class Application {
         $this->router->add('/users/edit/{id}', 'UserController@edit');
         $this->router->add('/users/delete/{id}', 'UserController@delete');
         $this->router->add('/users/profile', 'UserController@profile');
+        $this->router->add('/users/change-password', 'UserController@changePassword');
         
         // Notification routes
         $this->router->add('/notifications', 'NotificationController@index');
