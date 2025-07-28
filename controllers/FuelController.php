@@ -10,10 +10,22 @@ class FuelController extends BaseController {
         try {
             require_once __DIR__ . '/../models/FuelRecord.php';
             $fuelModel = new FuelRecord($this->db);
-            
-            // Get fuel records with vehicle and driver details
-            $fuelRecords = $fuelModel->getFuelRecordsWithDetails();
-            $fuelStats = $fuelModel->getFuelStats();
+
+            try {
+                // Get fuel records with vehicle and driver details
+                $fuelRecords = $fuelModel->getFuelRecordsWithDetails();
+                $fuelStats = $fuelModel->getFuelStats();
+            } catch (Exception $e) {
+                // Likely table missing; log and continue with defaults
+                error_log('FuelController error: ' . $e->getMessage());
+                $fuelRecords = [];
+                $fuelStats = [
+                    'total_records'=>0,
+                    'monthly_cost'=>0,
+                    'monthly_quantity'=>0,
+                    'avg_price'=>0
+                ];
+            }
             
             $data = [
                 'pageTitle' => 'Fuel Records - State Fleet Management System',
